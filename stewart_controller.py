@@ -22,27 +22,47 @@ class Stewart_Platform(object):
         pi = np.pi
 
         # Psi_B (Polar coordinates)
+        # psi_B = np.array(
+        #    [
+        #        -gamma_B,
+        #        gamma_B,
+        #        2 * pi / 3 - gamma_B,
+        #        2 * pi / 3 + gamma_B,
+        #        2 * pi / 3 + 2 * pi / 3 - gamma_B,
+        #        2 * pi / 3 + 2 * pi / 3 + gamma_B,
+        #    ]
+        # )
         psi_B = np.array(
             [
                 -gamma_B,
-                gamma_B,
-                2 * pi / 3 - gamma_B,
-                2 * pi / 3 + gamma_B,
-                2 * pi / 3 + 2 * pi / 3 - gamma_B,
                 2 * pi / 3 + 2 * pi / 3 + gamma_B,
+                2 * pi / 3 + 2 * pi / 3 - gamma_B,
+                2 * pi / 3 + gamma_B,
+                2 * pi / 3 - gamma_B,
+                gamma_B,
             ]
         )
 
         # psi_P (Polar coordinates)
         # Direction of the points where the rod is attached to the platform.
+        # psi_P = np.array(
+        #     [
+        #         pi / 3 + 2 * pi / 3 + 2 * pi / 3 + gamma_P,
+        #         pi / 3 + -gamma_P,
+        #         pi / 3 + gamma_P,
+        #         pi / 3 + 2 * pi / 3 - gamma_P,
+        #         pi / 3 + 2 * pi / 3 + gamma_P,
+        #         pi / 3 + 2 * pi / 3 + 2 * pi / 3 - gamma_P,
+        #     ]
+        # )
         psi_P = np.array(
             [
                 pi / 3 + 2 * pi / 3 + 2 * pi / 3 + gamma_P,
-                pi / 3 + -gamma_P,
-                pi / 3 + gamma_P,
-                pi / 3 + 2 * pi / 3 - gamma_P,
-                pi / 3 + 2 * pi / 3 + gamma_P,
                 pi / 3 + 2 * pi / 3 + 2 * pi / 3 - gamma_P,
+                pi / 3 + 2 * pi / 3 + gamma_P,
+                pi / 3 + 2 * pi / 3 - gamma_P,
+                pi / 3 + gamma_P,
+                pi / 3 + -gamma_P,
             ]
         )
 
@@ -102,7 +122,7 @@ class Stewart_Platform(object):
         rotation = np.transpose(rotation)
 
         # Get rotation matrix of platform. RotZ* RotY * RotX -> matmul
-        R = np.matmul(np.matmul(s.rotX(rotation[0]), s.rotY(rotation[1])), s.rotZ(rotation[2]))
+        R = np.matmul(np.matmul(s.rotZ(rotation[0]), s.rotY(rotation[1])), s.rotX(rotation[2]))
 
         # Get leg length for each leg
         # leg = np.repeat(trans[:, np.newaxis], 6, axis=1) + np.repeat(home_pos[:, np.newaxis], 6, axis=1) + np.matmul(np.transpose(R), P) - B
@@ -122,19 +142,20 @@ class Stewart_Platform(object):
         return s.lll
 
     def plot3D_line(s, ax, vec_arr_origin, vec_arr_dest, color_):
+        colors = ["orange", "red", "green", "blue", "yellow", "black"]
         for i in range(6):
             ax.plot(
                 [vec_arr_origin[0, i], vec_arr_dest[0, i]],
                 [vec_arr_origin[1, i], vec_arr_dest[1, i]],
                 [vec_arr_origin[2, i], vec_arr_dest[2, i]],
-                color=color_,
+                color=colors[i],
             )
 
     def plot_platform(s):
         ax = plt.axes(projection="3d")  # Data for a three-dimensional line
-        ax.set_xlim3d(-10, 10)
-        ax.set_ylim3d(-10, 10)
-        ax.set_zlim3d(0, 20)
+        ax.set_xlim3d(-600, 600)
+        ax.set_ylim3d(-600, 600)
+        ax.set_zlim3d(0, 600)
         ax.set_xlabel("x-axis")
         ax.set_ylabel("y-axis")
         ax.set_zlabel("z-axis")

@@ -1,9 +1,20 @@
 import csv
-
 from stewart_controller import Stewart_Platform
 import numpy as np
+import tkinter as tk
+from tkinter import filedialog
 
-filename = "positions.csv"
+root = tk.Tk()
+root.withdraw()
+
+"""
+Bottom: Radius = 50.7 cm
+        Angle  = 7 degrees
+Top:    Radius = 26.4 cm
+        Angle  = 13 degrees
+"""
+
+filename = filedialog.askopenfilename()
 with open(filename, "r") as f:
     # read csv and save to list
     reader = csv.reader(f)
@@ -34,6 +45,7 @@ for line in lines:
     print(convert)
     converted.append(convert)
 
-with open("converted.csv", "w", newline="") as csvfile:
-    writer = csv.writer(csvfile)
-    writer.writerows(converted)
+file = filedialog.asksaveasfile(filetypes=[("CSV Files", "*.csv")], defaultextension=[("CSV Files", "*.csv")])
+writer = csv.writer(file)
+writer.writerows(converted)
+file.close()
