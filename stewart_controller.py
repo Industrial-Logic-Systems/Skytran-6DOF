@@ -18,7 +18,7 @@ class Stewart_Platform(object):
     gamma_P = Half of angle between two anchors on the platform
     """
 
-    def __init__(s, r_B, r_P, lhl, ldl, gamma_B, gamma_P, ref_rotation):
+    def __init__(s, r_B, r_P, ldl, gamma_B, gamma_P):
         pi = np.pi
 
         # Psi_B (Polar coordinates)
@@ -45,10 +45,6 @@ class Stewart_Platform(object):
                 pi / 3 + 2 * pi / 3 + 2 * pi / 3 - gamma_P,
             ]
         )
-
-        psi_B = psi_B + np.repeat(ref_rotation, 6)
-        psi_P = psi_P + np.repeat(ref_rotation, 6)
-        beta = beta + np.repeat(ref_rotation, 6)
 
         # Coordinate of the points where servo arms
         # are attached to the corresponding servo axis.
@@ -81,36 +77,32 @@ class Stewart_Platform(object):
         # Save initialized variables
         s.r_B = r_B
         s.r_P = r_P
-        s.lhl = lhl
         s.ldl = ldl
         s.gamma_B = gamma_B
         s.gamma_P = gamma_P
 
         # Calculated params
-        s.beta = beta
         s.psi_B = psi_B
         s.psi_P = psi_P
         s.B = B
         s.P = P
 
         # Definition of the platform home position.
-        z = np.sqrt(s.ldl**2 + s.lhl**2 - (s.P[0] - s.B[0]) ** 2 - (s.P[1] - s.B[1]) ** 2)
-        s.home_pos = np.array([0, 0, z[0]])
+        s.home_pos = np.array([0, 0, s.ldl])
         # s.home_pos = np.transpose(home_pos)
 
         # Allocate for variables
         s.l = np.zeros((3, 6))
         s.lll = np.zeros((6))
-        s.angles = np.zeros((6))
-        s.H = np.zeros((3, 6))
+        # s.angles = np.zeros((6))
+        # s.H = np.zeros((3, 6))
 
     def calculate(s, trans, rotation):
         trans = np.transpose(trans)
         rotation = np.transpose(rotation)
 
         # Get rotation matrix of platform. RotZ* RotY * RotX -> matmul
-        R = np.matmul(np.matmul(s.rotZ(rotation[2]), s.rotY(rotation[1])), s.rotX(rotation[0]))
-        # R = np.matmul( np.matmul(s.rotX(rotation[0]), s.rotY(rotation[1])), s.rotZ(rotation[2]) )
+        R = np.matmul(np.matmul(s.rotX(rotation[0]), s.rotY(rotation[1])), s.rotZ(rotation[2]))
 
         # Get leg length for each leg
         # leg = np.repeat(trans[:, np.newaxis], 6, axis=1) + np.repeat(home_pos[:, np.newaxis], 6, axis=1) + np.matmul(np.transpose(R), P) - B
@@ -127,33 +119,7 @@ class Stewart_Platform(object):
         # Position of leg in global frame
         s.L = s.l + s.B
 
-        # Position of legs, wrt to their individual bases, split for clarity.
-        lx = s.l[0, :]
-        ly = s.l[1, :]
-        lz = s.l[2, :]
-
-        # Calculate auxiliary quatities g, f and e
-        g = s.lll**2 - (s.ldl**2 - s.lhl**2)
-        e = 2 * s.lhl * lz
-
-        # Calculate servo angles for each leg
-        for k in range(6):
-            fk = 2 * s.lhl * (np.cos(s.beta[k]) * lx[k] + np.sin(s.beta[k]) * ly[k])
-
-            # The wanted position could be achieved if the solution of this
-            # equation is real for all i
-            s.angles[k] = np.arcsin(g[k] / np.sqrt(e[k] ** 2 + fk**2)) - np.arctan2(fk, e[k])
-
-            # Get postion of the point where a spherical joint connects servo arm and rod.
-            s.H[:, k] = np.transpose(
-                [
-                    s.lhl * np.cos(s.angles[k]) * np.cos(s.beta[k]) + s.B[0, k],
-                    s.lhl * np.cos(s.angles[k]) * np.sin(s.beta[k]) + s.B[1, k],
-                    s.lhl * np.sin(s.angles[k]),
-                ]
-            )
-
-        return s.angles
+        return s.lll
 
     def plot3D_line(s, ax, vec_arr_origin, vec_arr_dest, color_):
         for i in range(6):
@@ -179,64 +145,17 @@ class Stewart_Platform(object):
         # ax.add_collection3d(base_plot, zs='z')
         ax.add_collection3d(Poly3DCollection([list(np.transpose(s.L))], facecolors="blue", alpha=0.25))
 
-        s.plot3D_line(ax, s.B, s.H, "red")
-        s.plot3D_line(ax, s.H, s.L, "black")
         s.plot3D_line(ax, s.B, s.L, "orange")
         return ax
 
-    def plot_platform_g(s, global_trans):
-        ax = plt.axes(projection="3d")  # Data for a three-dimensional line
-        ax.set_xlim3d(-400, 400)
-        ax.set_ylim3d(-400, 400)
-        ax.set_zlim3d(0, 200)
-        ax.set_xlabel("x-axis")
-        ax.set_ylabel("y-axis")
-        ax.set_zlabel("z-axis")
-
-        ax.add_collection3d(Poly3DCollection([list(np.transpose(s.B))], facecolors="green", alpha=0.25))
-        ax.add_collection3d(Poly3DCollection([list(np.transpose(s.L))], facecolors="blue", alpha=0.25))
-
-        s.plot3D_line(ax, s.B, s.H, "red")
-        s.plot3D_line(ax, s.H, s.L, "black")
-        s.plot3D_line(ax, s.B, s.L, "orange")
-        return ax
-
-    def rotX(s, phi):
-        rotx = np.array([[1, 0, 0], [0, np.cos(phi), -np.sin(phi)], [0, np.sin(phi), np.cos(phi)]])
+    def rotX(s, theta):
+        rotx = np.array([[1, 0, 0], [0, np.cos(theta), -np.sin(theta)], [0, np.sin(theta), np.cos(theta)]])
         return rotx
 
     def rotY(s, theta):
-        roty = np.array(
-            [
-                [np.cos(theta), 0, np.sin(theta)],
-                [0, 1, 0],
-                [-np.sin(theta), 0, np.cos(theta)],
-            ]
-        )
+        roty = np.array([[np.cos(theta), 0, np.sin(theta)], [0, 1, 0], [-np.sin(theta), 0, np.cos(theta)]])
         return roty
 
-    def rotZ(s, psi):
-        rotz = np.array([[np.cos(psi), -np.sin(psi), 0], [np.sin(psi), np.cos(psi), 0], [0, 0, 1]])
+    def rotZ(s, theta):
+        rotz = np.array([[np.cos(theta), -np.sin(theta), 0], [np.sin(theta), np.cos(theta), 0], [0, 0, 1]])
         return rotz
-
-    # Roll yaw pitch notation
-    # def rotX(s, phi):
-    #     rotx = np.array([
-    #         [1,     0    ,    0    ],
-    #         [0,  np.cos(phi), np.sin(phi)],
-    #         [0, -np.sin(phi), np.cos(phi)] ])
-    #     return rotx
-
-    # def rotY(s, theta):
-    #     roty = np.array([
-    #         [np.cos(theta), 0, -np.sin(theta) ],
-    #         [0         , 1,     0       ],
-    #         [np.sin(theta), 0,  np.cos(theta) ] ])
-    #     return roty
-
-    # def rotZ(s, psi):
-    #     rotz = np.array([
-    #         [ np.cos(psi), np.sin(psi), 0 ],
-    #         [-np.sin(psi), np.cos(psi), 0 ],
-    #         [   0        ,     0      , 1 ] ])
-    #     return rotz
