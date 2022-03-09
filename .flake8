@@ -1,0 +1,8 @@
+[flake8]
+max_line_length = 127
+extend_ignore = E203, W503
+exclude =
+    .venv
+in-place = true
+pep8-passes = 2000
+recursive = true
