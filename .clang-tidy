@@ -21,4 +21,3 @@ HeaderFilterRegex:  '.hpp'
 FormatStyle:        file
 User:               'Frazzer'
 ...
-

@@ -1,21 +1,16 @@
 import csv
-from stewart_controller import Stewart_Platform
-import numpy as np
 import tkinter as tk
 from tkinter import filedialog
+
+import numpy as np
+from stewart_controller import Stewart_Platform
 
 root = tk.Tk()
 root.withdraw()
 
-"""
-Bottom: Radius = 50.7 cm
-        Angle  = 7 degrees
-Top:    Radius = 26.4 cm
-        Angle  = 13 degrees
-"""
 
 filename = filedialog.askopenfilename()
-with open(filename, "r") as f:
+with open(filename) as f:
     # read csv and save to list
     reader = csv.reader(f)
     lines = list(reader)

@@ -1,7 +1,8 @@
-import numpy as np
-from stewart_controller import Stewart_Platform
 import matplotlib.pyplot as plt
-from numpy import sin, cos
+import numpy as np
+from numpy import cos
+from numpy import sin
+from stewart_controller import Stewart_Platform
 
 
 def main():
@@ -41,7 +42,7 @@ def main():
     actuator_lengths = platform.calculate(np.array([0, 0, 0]), np.array([0, 0, 0]))
 
     print(actuator_lengths)
-    print((actuator_lengths - servo_length))
+    print(actuator_lengths - servo_length)
     ax = platform.plot_platform()
     plt.pause(1000000000)
 

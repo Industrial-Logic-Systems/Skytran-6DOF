@@ -1,10 +1,10 @@
+import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.mplot3d import axes3d
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-import matplotlib.pyplot as plt
 
 
-class Stewart_Platform(object):
+class Stewart_Platform:
     """
     Yeok 2022
     Stewart Platform Python Implementation
@@ -113,7 +113,7 @@ class Stewart_Platform(object):
 
         # Allocate for variables
         s.l = np.zeros((3, 6))
-        s.lll = np.zeros((6))
+        s.lll = np.zeros(6)
         # s.angles = np.zeros((6))
         # s.H = np.zeros((3, 6))
 

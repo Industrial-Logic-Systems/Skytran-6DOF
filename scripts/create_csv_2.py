@@ -1,5 +1,7 @@
-from numpy import sin, pi
 import csv
+
+from numpy import pi
+from numpy import sin
 
 num_cycles = 5
 freq = 1

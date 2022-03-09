@@ -14,5 +14,5 @@ while True:
     # data = data.replace("b'U", "")
     # data = data.replace("'", "")
     # data = ":".join(hex(x)[2:] for x in data)
-    data = ":".join("{:02x}".format(x) for x in data)
+    data = ":".join(f"{x:02x}" for x in data)
     print("string:", data)

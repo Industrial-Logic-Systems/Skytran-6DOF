@@ -1,6 +1,6 @@
 import csv
-from email import message
 import socket
+from email import message
 from time import sleep
 
 UDP_IP = "<broadcast>"
@@ -127,7 +127,7 @@ sleep(1)
 # filename = "example.csv"
 # filename = "data.csv"
 filename = "data_1.csv"
-with open(filename, "r") as f:
+with open(filename) as f:
     # read csv and save to list
     reader = csv.reader(f)
     lines = list(reader)
@@ -138,9 +138,7 @@ print(lines)
 
 messages = [
     (
-        create_message(
-            line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7]
-        ),
+        create_message(line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7]),
         line[1] / 1000.0,
     )
     for line in lines

@@ -1,5 +1,8 @@
-from numpy import sin, cos, pi
 import csv
+
+from numpy import cos
+from numpy import pi
+from numpy import sin
 
 
 def scale(value, old_min, old_max, new_min, new_max):
@@ -15,7 +18,7 @@ for i in range(1, 1001):
     line = []
     line.append(i)
     line.append(10)
-    val = scale(sin(i/100), -1, 1, 0, 100)
+    val = scale(sin(i / 100), -1, 1, 0, 100)
     line.append(val)
     line.append(val)
     line.append(val)
