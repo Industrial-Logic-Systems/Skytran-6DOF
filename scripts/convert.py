@@ -1,6 +1,7 @@
 import csv
 import tkinter as tk
 from tkinter import filedialog
+from unicodedata import numeric
 
 import numpy as np
 from stewart_controller import Stewart_Platform
@@ -24,7 +25,19 @@ def main():
         lines = list(reader)
 
     lines = lines[1:]
-    lines = [[int(x) for x in line] for line in lines]
+    lines = [
+        [
+            int(line[0]),
+            int(line[1]),
+            float(line[2]),
+            float(line[3]),
+            float(line[4]),
+            float(line[5]),
+            float(line[6]),
+            float(line[7]),
+        ]
+        for line in lines
+    ]
     # print(lines)
 
     min = 0
@@ -36,6 +49,7 @@ def main():
     converted = [["Line", "Time (ms)", "X", "Y", "Z", "U", "V", "W"]]
 
     for line in lines:
+        print(f"Calculating line: {line[0]}")
         convert = [line[0], line[1]]
         x = line[2]
         y = line[3]
@@ -51,6 +65,7 @@ def main():
             print("If values are less than {min} try moving the whole motion profile up by adding to the Z axis")
             print(f"If values are greater than {max} it likely means your moving out of range of the platform")
             return
+        actuator_lengths = [int(x) for x in actuator_lengths]
         convert.extend(actuator_lengths)
         converted.append(convert)
 

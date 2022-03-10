@@ -8,7 +8,7 @@ num_cycles = 5
 freq = 1
 time_step = 0.01 * 1000
 frequency = 50
-filename = "circle.csv"
+filename = "circle_6.csv"
 
 
 csv_data = [["Line", "Time (ms)", "X", "Y", "Z", "PITCH", "ROLL", "YAW"]]
@@ -18,12 +18,12 @@ for i in range(1, int(num_cycles * freq * 1000 / time_step + 1)):
 
     angle = i * (2 * pi / (freq / (time_step / 1000)))
 
-    val_1 = int(frequency * cos(angle))
-    val_2 = int(frequency * sin(angle))
-    val_3 = 10
-    val_4 = 0
-    val_5 = 0
-    val_6 = 0
+    val_1 = frequency * cos(angle)
+    val_2 = frequency * sin(angle)
+    val_3 = 100
+    val_4 = pi / 24 * cos(angle)
+    val_5 = pi / 24 * cos(angle)
+    val_6 = pi / 24 * sin(angle)
 
     line.append(val_1)
     line.append(val_2)
