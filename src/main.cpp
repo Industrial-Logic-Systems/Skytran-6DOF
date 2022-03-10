@@ -4,6 +4,7 @@
 #include <chrono>
 #include <fstream>
 #include <iostream>
+#include <nfd.h>
 #include <sstream>
 #include <string>
 #include <thread>
@@ -159,7 +160,7 @@ int main()
       create_message( 1, 10, MAX_DIST / 2, MAX_DIST / 2, MAX_DIST / 2, MAX_DIST / 2, MAX_DIST / 2, MAX_DIST / 2 );
   char * min = create_message( 1, 10, 0, 0, 0, 0, 0, 0 );
 
-  if( true )
+  if( false )
   {
     char * custom   = create_message( 1, 1000, 43, 43, 43, 43, 43, 43 );
     char * custom_1 = create_message( 1, 1000, 0, 121, 0, 121, 0, 121 );
@@ -192,37 +193,52 @@ int main()
   }
   else
   {
-    vector<pair<char *, int>> messages;
-    string                    filename;
-    cout << "Enter filename: ";
-    getline( cin, filename );
-    vector<vector<string>> csv_data = read_csv( filename );
-    for( int i = 1; i < csv_data.size(); i++ )
-    {
-      int    line    = stoi( csv_data[i][0] );
-      int    time    = stoi( csv_data[i][1] );
-      int    x       = stoi( csv_data[i][2] );
-      int    y       = stoi( csv_data[i][3] );
-      int    z       = stoi( csv_data[i][4] );
-      int    u       = stoi( csv_data[i][5] );
-      int    v       = stoi( csv_data[i][6] );
-      int    w       = stoi( csv_data[i][7] );
-      char * message = create_message( line, time, x, y, z, u, v, w );
-      messages.push_back( make_pair( message, time ) );
-      cout << "Line: " << line << " Time: " << time << " X: " << x << " Y: " << y << " Z: " << z << " U: " << u
-           << " V: " << v << " W: " << w << endl;
-    }
+    nfdchar_t * outPath = NULL;
+    nfdresult_t result  = NFD_OpenDialog( NULL, NULL, &outPath );
 
-    if( messages.size() > 0 )
+    if( result == NFD_OKAY )
     {
-      send_move_message( s, dest, messages[0].first );
-      std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-    }
+      vector<pair<char *, int>> messages;
+      string                    filename = outPath;
+      vector<vector<string>>    csv_data = read_csv( filename );
 
-    for( auto & [message, time] : messages )
+      for( int i = 1; i < csv_data.size(); i++ )
+      {
+        int    line    = stoi( csv_data[i][0] );
+        int    time    = stoi( csv_data[i][1] );
+        int    x       = stoi( csv_data[i][2] );
+        int    y       = stoi( csv_data[i][3] );
+        int    z       = stoi( csv_data[i][4] );
+        int    u       = stoi( csv_data[i][5] );
+        int    v       = stoi( csv_data[i][6] );
+        int    w       = stoi( csv_data[i][7] );
+        char * message = create_message( line, time, x, y, z, u, v, w );
+        messages.push_back( make_pair( message, time ) );
+        cout << "Line: " << line << " Time: " << time << " X: " << x << " Y: " << y << " Z: " << z << " U: " << u
+             << " V: " << v << " W: " << w << endl;
+      }
+
+      cout << "\n\nSending messages..." << endl;
+
+      if( messages.size() > 0 )
+      {
+        send_move_message( s, dest, messages[0].first );
+        std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+      }
+
+      for( auto & [message, time] : messages )
+      {
+        send_move_message( s, dest, message );
+        std::this_thread::sleep_for( std::chrono::milliseconds( time ) );
+      }
+    }
+    else if( result == NFD_CANCEL )
     {
-      send_move_message( s, dest, message );
-      std::this_thread::sleep_for( std::chrono::milliseconds( time ) );
+      cout << "User pressed cancel." << std::endl;
+    }
+    else
+    {
+      std::cout << "Error: " << NFD_GetError() << std::endl;
     }
   }
 
