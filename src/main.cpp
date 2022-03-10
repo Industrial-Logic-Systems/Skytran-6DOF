@@ -38,7 +38,7 @@ int jog_pulse( double Gear, double AccessDistance, double LeadDistance, int OneT
 }
 
 
-vector<vector<string>> read_csv( string filename )
+vector<vector<string>> read_csv( const string & filename )
 {
   vector<vector<string>> data;
   vector<string>         row;
@@ -137,9 +137,9 @@ int main()
 {
   const char * srcIP  = "";
   const char * destIP = "255.255.255.255";
-  sockaddr_in  dest;
-  sockaddr_in  local;
-  WSAData      data;
+  sockaddr_in  dest {};
+  sockaddr_in  local {};
+  WSAData      data {};
   WSAStartup( MAKEWORD( 2, 2 ), &data );
 
   local.sin_family = AF_INET;
@@ -160,7 +160,9 @@ int main()
       create_message( 1, 10, MAX_DIST / 2, MAX_DIST / 2, MAX_DIST / 2, MAX_DIST / 2, MAX_DIST / 2, MAX_DIST / 2 );
   char * min = create_message( 1, 10, 0, 0, 0, 0, 0, 0 );
 
-  if( false )
+  bool run_custom = false;
+
+  if( run_custom )
   {
     char * custom   = create_message( 1, 1000, 43, 43, 43, 43, 43, 43 );
     char * custom_1 = create_message( 1, 1000, 0, 121, 0, 121, 0, 121 );
@@ -193,8 +195,8 @@ int main()
   }
   else
   {
-    nfdchar_t * outPath = NULL;
-    nfdresult_t result  = NFD_OpenDialog( NULL, NULL, &outPath );
+    nfdchar_t * outPath = nullptr;
+    nfdresult_t result  = NFD_OpenDialog( nullptr, nullptr, &outPath );
 
     if( result == NFD_OKAY )
     {
@@ -213,14 +215,14 @@ int main()
         int    v       = stoi( csv_data[i][6] );
         int    w       = stoi( csv_data[i][7] );
         char * message = create_message( line, time, x, y, z, u, v, w );
-        messages.push_back( make_pair( message, time ) );
+        messages.emplace_back( message, time );
         cout << "Line: " << line << " Time: " << time << " X: " << x << " Y: " << y << " Z: " << z << " U: " << u
              << " V: " << v << " W: " << w << endl;
       }
 
       cout << "\n\nSending messages..." << endl;
 
-      if( messages.size() > 0 )
+      if( !messages.empty() )
       {
         send_move_message( s, dest, messages[0].first );
         std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
