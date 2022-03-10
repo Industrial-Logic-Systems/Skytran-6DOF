@@ -122,7 +122,7 @@ class Stewart_Platform:
         rotation = np.transpose(rotation)
 
         # Get rotation matrix of platform. RotZ* RotY * RotX -> matmul
-        R = np.matmul(np.matmul(s.rotZ(rotation[0]), s.rotY(rotation[1])), s.rotX(rotation[2]))
+        R = np.matmul(np.matmul(s.rotZ(rotation[2]), s.rotY(rotation[1])), s.rotX(rotation[0]))
 
         # Get leg length for each leg
         # leg = np.repeat(trans[:, np.newaxis], 6, axis=1) + np.repeat(home_pos[:, np.newaxis], 6, axis=1) + np.matmul(np.transpose(R), P) - B

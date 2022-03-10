@@ -43,10 +43,10 @@ def main():
 
     print(actuator_lengths)
     print(actuator_lengths - servo_length)
-    ax = platform.plot_platform()
-    plt.pause(1000000000)
+    # ax = platform.plot_platform()
+    # plt.pause(1000000000)
 
-    plt.draw()
+    # plt.draw()
 
 
 if __name__ == "__main__":

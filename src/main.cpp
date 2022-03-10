@@ -19,24 +19,20 @@ using namespace std;
 // const int SCALE_MIN = 0;
 // const int SCALE_MAX = 400000;
 
-const double GEAR                = 2.0;
-const double MAX_ACCESS_DISTANCE = 275.0;
-const double LEAD_DISTANCE       = 10.0;
-const int    ONE_TURN_PULSE      = 10000;
+// const double GEAR                = 2.0;
+// const double MAX_ACCESS_DISTANCE = 200.0;
+// const double LEAD_DISTANCE       = 2.5;
+// const int    ONE_TURN_PULSE      = 1000;
 
-int scale( int value, int old_min, int old_max, int new_min, int new_max )
-{
-  double old_range     = old_max - old_min;
-  double new_range     = new_max - new_min;
-  double new_value     = ( ( ( value - old_min ) * new_range ) / old_range ) + new_min;
-  int    new_value_int = static_cast<int>( new_value );
-  new_value_int        = clamp( new_value_int, new_min, new_max );
-  return new_value_int;
-}
+const double GEAR           = 1 / 1.5;
+const double MAX_DIST       = 200.0;
+const double LEAD_DISTANCE  = 5;
+const int    ONE_TURN_PULSE = 20000;
+
 
 int jog_pulse( double Gear, double AccessDistance, double LeadDistance, int OneTurnPulse )
 {
-  AccessDistance = clamp( AccessDistance, 0.0, MAX_ACCESS_DISTANCE );
+  AccessDistance = clamp( AccessDistance, 0.0, MAX_DIST );
   return static_cast<int>( Gear * AccessDistance * OneTurnPulse / LeadDistance );
 }
 
@@ -62,7 +58,7 @@ vector<vector<string>> read_csv( string filename )
   }
   else
   {
-    cout << "Unable to open file";
+    cout << "Error: Unable to open file " << filename << endl;
   }
   return data;
 }
@@ -158,67 +154,76 @@ int main()
   char broadcast = 1;
   setsockopt( s, SOL_SOCKET, SO_BROADCAST, &broadcast, sizeof( broadcast ) );
 
-  /*
-  vector<pair<char *, int>> messages;
-  vector<vector<string>>    csv_data = read_csv( "data_3.csv" );
-  for( int i = 1; i < csv_data.size(); i++ )
+  char * max = create_message( 1, 10, MAX_DIST, MAX_DIST, MAX_DIST, MAX_DIST, MAX_DIST, MAX_DIST );
+  char * mid =
+      create_message( 1, 10, MAX_DIST / 2, MAX_DIST / 2, MAX_DIST / 2, MAX_DIST / 2, MAX_DIST / 2, MAX_DIST / 2 );
+  char * min = create_message( 1, 10, 0, 0, 0, 0, 0, 0 );
+
+  if( false )
   {
-    int    line    = stoi( csv_data[i][0] );
-    int    time    = stoi( csv_data[i][1] );
-    int    x       = stoi( csv_data[i][2] );
-    int    y       = stoi( csv_data[i][3] );
-    int    z       = stoi( csv_data[i][4] );
-    int    u       = stoi( csv_data[i][5] );
-    int    v       = stoi( csv_data[i][6] );
-    int    w       = stoi( csv_data[i][7] );
-    char * message = create_message( line, time, x, y, z, u, v, w );
-    messages.push_back( make_pair( message, time ) );
-    cout << "Line: " << line << " Time: " << time << " X: " << x << " Y: " << y << " Z: " << z << " U: " << u
-         << " V: " << v << " W: " << w << endl;
+    char * custom   = create_message( 1, 1000, 43, 43, 43, 43, 43, 43 );
+    char * custom_1 = create_message( 1, 1000, 0, 121, 0, 121, 0, 121 );
+    char * custom_2 = create_message( 1, 1000, 121, 0, 121, 0, 121, 0 );
+    char * custom_3 = create_message( 1, 1000, 22, 65, 49, 49, 65, 22 );
+    char * custom_4 = create_message( 1, 1000, 36, 61, 70, 20, 30, 55 );
+
+    send_move_message( s, dest, min );
+    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+    send_move_message( s, dest, custom );
+    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+    send_move_message( s, dest, custom_1 );
+    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+    send_move_message( s, dest, custom_2 );
+    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+    send_move_message( s, dest, custom );
+    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+    send_move_message( s, dest, custom_3 );
+    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+    send_move_message( s, dest, custom );
+    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+    send_move_message( s, dest, custom_4 );
+    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+    send_move_message( s, dest, custom );
+    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+    send_move_message( s, dest, max );
+    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+    send_move_message( s, dest, min );
   }
-  */
-
-  char * max     = create_message( 1, 10, MAX_ACCESS_DISTANCE, MAX_ACCESS_DISTANCE, MAX_ACCESS_DISTANCE,
-                                   MAX_ACCESS_DISTANCE, MAX_ACCESS_DISTANCE, MAX_ACCESS_DISTANCE );
-  char * mid     = create_message( 1, 10, MAX_ACCESS_DISTANCE / 2, MAX_ACCESS_DISTANCE / 2, MAX_ACCESS_DISTANCE / 2,
-                                   MAX_ACCESS_DISTANCE / 2, MAX_ACCESS_DISTANCE / 2, MAX_ACCESS_DISTANCE / 2 );
-  char * min     = create_message( 1, 10, 0, 0, 0, 0, 0, 0 );
-  char * hundred = create_message( 1, 10, 100, 100, 100, 100, 100, 100 );
-
-
-  char * custom   = create_message( 1, 10, 102, 102, 102, 102, 102, 102 );
-  char * custom_1 = create_message( 1, 1000, 46, 160, 46, 160, 46, 160 );
-  char * custom_2 = create_message( 1, 1000, 160, 46, 160, 46, 160, 46 );
-  char * custom_3 = create_message( 1, 1000, 67, 107, 92, 92, 107, 67 );
-  char * custom_4 = create_message( 1, 1000, 80, 103, 112, 65, 74, 98 );
-
-  send_move_message( s, dest, min );
-  std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-  send_move_message( s, dest, custom );
-  std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-  send_move_message( s, dest, custom_1 );
-  std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-  send_move_message( s, dest, custom_2 );
-  std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-  send_move_message( s, dest, hundred );
-  std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-  send_move_message( s, dest, custom_3 );
-  std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-  send_move_message( s, dest, hundred );
-  std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-  send_move_message( s, dest, custom_4 );
-  std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-  send_move_message( s, dest, hundred );
-  std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-  send_move_message( s, dest, max );
-
-  /*
-  for( auto & [message, time] : messages )
+  else
   {
-    send_move_message( s, dest, message );
-    std::this_thread::sleep_for( std::chrono::milliseconds( time ) );
+    vector<pair<char *, int>> messages;
+    string                    filename;
+    cout << "Enter filename: ";
+    getline( cin, filename );
+    vector<vector<string>> csv_data = read_csv( filename );
+    for( int i = 1; i < csv_data.size(); i++ )
+    {
+      int    line    = stoi( csv_data[i][0] );
+      int    time    = stoi( csv_data[i][1] );
+      int    x       = stoi( csv_data[i][2] );
+      int    y       = stoi( csv_data[i][3] );
+      int    z       = stoi( csv_data[i][4] );
+      int    u       = stoi( csv_data[i][5] );
+      int    v       = stoi( csv_data[i][6] );
+      int    w       = stoi( csv_data[i][7] );
+      char * message = create_message( line, time, x, y, z, u, v, w );
+      messages.push_back( make_pair( message, time ) );
+      cout << "Line: " << line << " Time: " << time << " X: " << x << " Y: " << y << " Z: " << z << " U: " << u
+           << " V: " << v << " W: " << w << endl;
+    }
+
+    if( messages.size() > 0 )
+    {
+      send_move_message( s, dest, messages[0].first );
+      std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+    }
+
+    for( auto & [message, time] : messages )
+    {
+      send_move_message( s, dest, message );
+      std::this_thread::sleep_for( std::chrono::milliseconds( time ) );
+    }
   }
-  */
 
   closesocket( s );
   WSACleanup();
