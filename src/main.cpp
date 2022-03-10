@@ -159,13 +159,14 @@ int main()
       create_message( 1, 10, MAX_DIST / 2, MAX_DIST / 2, MAX_DIST / 2, MAX_DIST / 2, MAX_DIST / 2, MAX_DIST / 2 );
   char * min = create_message( 1, 10, 0, 0, 0, 0, 0, 0 );
 
-  if( false )
+  if( true )
   {
     char * custom   = create_message( 1, 1000, 43, 43, 43, 43, 43, 43 );
     char * custom_1 = create_message( 1, 1000, 0, 121, 0, 121, 0, 121 );
     char * custom_2 = create_message( 1, 1000, 121, 0, 121, 0, 121, 0 );
     char * custom_3 = create_message( 1, 1000, 22, 65, 49, 49, 65, 22 );
     char * custom_4 = create_message( 1, 1000, 36, 61, 70, 20, 30, 55 );
+    char * custom_5 = create_message( 1, 1000, 25, 25, 25, 25, 25, 25 );
 
     send_move_message( s, dest, min );
     std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
