@@ -158,7 +158,8 @@ int main()
   char * max = create_message( 1, 10, MAX_DIST, MAX_DIST, MAX_DIST, MAX_DIST, MAX_DIST, MAX_DIST );
   char * mid =
       create_message( 1, 10, MAX_DIST / 2, MAX_DIST / 2, MAX_DIST / 2, MAX_DIST / 2, MAX_DIST / 2, MAX_DIST / 2 );
-  char * min = create_message( 1, 10, 0, 0, 0, 0, 0, 0 );
+  char * min      = create_message( 1, 10, 0, 0, 0, 0, 0, 0 );
+  char * min_slow = create_message( 1, 2000, 0, 0, 0, 0, 0, 0 );
 
   bool run_custom = false;
 
@@ -172,52 +173,12 @@ int main()
     char * custom_5 = create_message( 1, 1000, 25, 25, 25, 25, 25, 25 );
 
     char * rest  = create_message( 1, 1000, 26, 26, 26, 26, 26, 26 );
-    char * x_pos = create_message( 1, 1000, 4, 48, 32, 32, 48, 4 );
-    char * x_neg = create_message( 1, 1000, 52, 8, 25, 25, 8, 52 );
-    char * y_pos = create_message( 1, 1000, 18, 44, 53, 2, 12, 38 );
-    char * y_neg = create_message( 1, 1000, 38, 12, 2, 53, 44, 18 );
-
-    char * x_pos_corrected = create_message( 1, 1000, 38, 25, 43, 7, 2, 51 );
-    char * x_neg_corrected = create_message( 1, 1000, 18, 31, 12, 48, 53, 4 );
-    char * y_pos_corrected = create_message( 1, 1000, 51, 2, 7, 43, 25, 38 );
-    char * y_neg_corrected = create_message( 1, 1000, 4, 53, 48, 12, 31, 18 );
+    char * x_pos = create_message( 1, 1000, 38, 25, 43, 7, 2, 51 );
+    char * x_neg = create_message( 1, 1000, 18, 31, 12, 48, 53, 4 );
+    char * y_pos = create_message( 1, 1000, 51, 2, 7, 43, 25, 38 );
+    char * y_neg = create_message( 1, 1000, 4, 53, 48, 12, 31, 18 );
 
     send_move_message( s, dest, min );
-    /*
-    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-    send_move_message( s, dest, rest );
-    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-    send_move_message( s, dest, x_pos );
-    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-    send_move_message( s, dest, rest );
-    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-    send_move_message( s, dest, x_neg );
-    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-    send_move_message( s, dest, rest );
-    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-    send_move_message( s, dest, y_pos );
-    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-    send_move_message( s, dest, rest );
-    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-    send_move_message( s, dest, y_neg );
-    */
-    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-    send_move_message( s, dest, rest );
-    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-    send_move_message( s, dest, x_pos_corrected );
-    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-    send_move_message( s, dest, rest );
-    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-    send_move_message( s, dest, x_neg_corrected );
-    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-    send_move_message( s, dest, rest );
-    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-    send_move_message( s, dest, y_pos_corrected );
-    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-    send_move_message( s, dest, rest );
-    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-    send_move_message( s, dest, y_neg_corrected );
-    /*
     std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
     send_move_message( s, dest, custom_1 );
     std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
@@ -235,7 +196,23 @@ int main()
     std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
     send_move_message( s, dest, max );
     std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-    send_move_message( s, dest, min );*/
+    send_move_message( s, dest, rest );
+    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+    send_move_message( s, dest, x_pos );
+    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+    send_move_message( s, dest, rest );
+    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+    send_move_message( s, dest, x_neg );
+    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+    send_move_message( s, dest, rest );
+    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+    send_move_message( s, dest, y_pos );
+    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+    send_move_message( s, dest, rest );
+    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+    send_move_message( s, dest, y_neg );
+    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+    send_move_message( s, dest, min );
   }
   else
   {
@@ -277,6 +254,9 @@ int main()
         send_move_message( s, dest, message );
         std::this_thread::sleep_for( std::chrono::milliseconds( time ) );
       }
+
+      std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+      send_move_message( s, dest, min_slow );
     }
     else if( result == NFD_CANCEL )
     {
