@@ -1,8 +1,11 @@
 import csv
 import tkinter as tk
+from math import radians
 from tkinter import filedialog
 
 import numpy as np
+from numpy import cos
+from numpy import sin
 from stewart_controller import Stewart_Platform
 
 min = 0
@@ -28,8 +31,11 @@ def get_converted(lines, shift_amts):
         cur_time = line[0] * 1000
         convert = [i, int(cur_time - prev_time)]
         prev_time = cur_time
-        x = line[1] * 1000 + shift_amts[0]
-        y = line[2] * 1000 + shift_amts[1]
+        x_og = line[1] * 1000 + shift_amts[0]
+        y_og = line[2] * 1000 + shift_amts[1]
+        angle = radians(225)
+        x = x_og * cos(angle) + y_og * sin(angle)
+        y = -x_og * sin(angle) + y_og * cos(angle)
         z = line[3] * 1000 + shift_amts[2]
         u = line[4]
         v = line[5]
