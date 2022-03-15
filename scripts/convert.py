@@ -33,7 +33,7 @@ def get_converted(lines, shift_amts):
         prev_time = cur_time
         x_og = line[1] * 1000 + shift_amts[0]
         y_og = line[2] * 1000 + shift_amts[1]
-        angle = radians(225)
+        angle = radians(45)
         x = x_og * cos(angle) + y_og * sin(angle)
         y = -x_og * sin(angle) + y_og * cos(angle)
         z = line[3] * 1000 + shift_amts[2]
