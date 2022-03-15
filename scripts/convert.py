@@ -48,7 +48,7 @@ def get_converted(lines, shift_amts):
             print("If values are less than {min} try moving the whole motion profile up by adding to the Z axis")
             print(f"If values are greater than {max} it likely means your moving out of range of the platform")
             return None
-        actuator_lengths = [int(x) for x in actuator_lengths]
+        actuator_lengths = [round(x) for x in actuator_lengths]
         convert.extend(actuator_lengths)
         converted.append(convert)
     return converted

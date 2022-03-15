@@ -41,18 +41,18 @@ def main():
     #    plt.draw()
 
     # servo_angles = platform.calculate_matrix(np.array([2, 1, 0]), np.array([0, angle, 0]))
-    x = 0
-    y = 50
+    x = 125
+    y = 125
     angle = radians(225)
     x_cor = x * cos(angle) + y * sin(angle)
     y_cor = -x * sin(angle) + y * cos(angle)
 
-    actuator_lengths = platform.calculate(np.array([x_cor, y_cor, 10]), np.array([0, 0, 0]))
+    actuator_lengths = platform.calculate(np.array([x_cor, y_cor, 100]), np.array([0, 0, 0]))
 
     print("Base:", actuator_lengths)
     actuator_lengths = actuator_lengths - servo_length
     print("Lengths:", actuator_lengths)
-    actuator_lengths = [int(x) for x in actuator_lengths]
+    actuator_lengths = [round(x) for x in actuator_lengths]
     print("Lengths Int:", actuator_lengths)
     # ax = platform.plot_platform()
     # plt.pause(1000000000)
