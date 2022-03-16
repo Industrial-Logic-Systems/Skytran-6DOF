@@ -165,30 +165,32 @@ int main()
 
   if( run_custom )
   {
-    char * rest  = create_message( 1, 1000, 26, 26, 26, 26, 26, 26 );
-    char * x_pos = create_message( 1, 1000, 38, 25, 43, 7, 2, 51 );
-    char * x_neg = create_message( 1, 1000, 18, 31, 12, 48, 53, 4 );
-    char * y_pos = create_message( 1, 1000, 51, 2, 7, 43, 25, 38 );
-    char * y_neg = create_message( 1, 1000, 4, 53, 48, 12, 31, 18 );
+    char * rest  = create_message( 1, 1000, 98, 98, 98, 98, 98, 98 );
+    char * x_pos = create_message( 1, 1000, 90, 102, 87, 118, 122, 80 );
+    char * x_neg = create_message( 1, 1000, 110, 98, 113, 82, 78, 120 );
+    char * y_pos = create_message( 1, 1000, 80, 122, 118, 87, 102, 90 );
+    char * y_neg = create_message( 1, 1000, 120, 78, 82, 113, 98, 110 );
 
-    char * rest_100  = create_message( 1, 1000, 61, 61, 61, 61, 61, 61 );
-    char * x_pos_max = create_message( 1, 4000, 104, 68, 119, 17, 2, 140 );
-    char * x_neg_max = create_message( 1, 4000, 48, 86, 32, 132, 145, 7 );
-    char * y_pos_max = create_message( 1, 4000, 140, 2, 17, 119, 68, 104 );
-    char * y_neg_max = create_message( 1, 4000, 7, 145, 132, 32, 86, 48 );
+    char * x_cust = create_message( 1, 1000, 90, 102, 87, 118, 122, 80 );
 
-    char * zero       = create_message( 1, 10, 18, 18, 18, 18, 18, 18 );
-    char * mm26       = create_message( 1, 10, 41, 41, 41, 41, 41, 41 );
-    char * max_height = create_message( 1, 10, 195, 195, 195, 195, 195, 195 );
-
-    send_move_message( s, dest, zero );
+    send_move_message( s, dest, rest );
     std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-    send_move_message( s, dest, mm26 );
+    send_move_message( s, dest, x_pos );
     std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-    send_move_message( s, dest, max_height );
+    send_move_message( s, dest, rest );
     std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-    send_move_message( s, dest, min_slow );
-  }
+    send_move_message( s, dest, x_neg );
+    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+    send_move_message( s, dest, rest );
+    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+    send_move_message( s, dest, y_pos );
+    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+    send_move_message( s, dest, rest );
+    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+    send_move_message( s, dest, y_neg );
+    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+    send_move_message( s, dest, rest );
+    }
   else
   {
     nfdchar_t * outPath = nullptr;

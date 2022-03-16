@@ -10,9 +10,6 @@ from stewart_controller import Stewart_Platform
 def main():
     pi = np.pi
 
-    # Call object
-    # platform = Stewart_Platform(6.2, 5, 0, 0.2269, 0.2269)
-
     """
     Bottom: Radius = 50.7 cm    - 507 mm
             Angle  = 7 degrees  - 0.1226 rad
@@ -20,34 +17,30 @@ def main():
             Angle  = 13 degrees - 0.2268 rad
     """
 
-    # platform = Stewart_Platform(6.2, 5, 10, 0.2269, 0.82)
+    # Base Angle 0.1267
+    # Base Radius 474.659
+
+    # Platform Angle 0.2182
+    # Platform Radius 230.955
+
+    # platform_height = 570
+    # servo_length = 650
+    # platform = Stewart_Platform(507, 264, platform_height, 0.1226, 0.2268)
+
     platform_height = 570
     servo_length = 650
-    platform = Stewart_Platform(507, 264, platform_height, 0.1226, 0.2268)
+    platform = Stewart_Platform(474.659, 230.955, platform_height, 0.1267, 0.2182)
 
     # Initialize Plots
     fig, ax = plt.subplots()
 
-    # Loop through various angles
-    # for ix in range(0, 360, 45):
-    #    angle = np.pi * ix / 180
-    #    print("angle: ", angle)
-    #    # servo_angles = platform.calculate_matrix(np.array([2, 1, 0]), np.array([0, angle, 0]))
-    #    servo_angles = platform.calculate(np.array([5 * cos(angle), 5 * sin(angle), 0]), np.array([0, 0, 0]))
-    #    print(servo_angles)
-    #    ax = platform.plot_platform()
-    #    plt.pause(1000000000)
-
-    #    plt.draw()
-
-    # servo_angles = platform.calculate_matrix(np.array([2, 1, 0]), np.array([0, angle, 0]))
-    x = 0
+    x = 50
     y = 0
     angle = radians(45)
     x_cor = x * cos(angle) + y * sin(angle)
     y_cor = -x * sin(angle) + y * cos(angle)
 
-    actuator_lengths = platform.calculate(np.array([x_cor, y_cor, 0]), np.array([0, 0, 0]))
+    actuator_lengths = platform.calculate(np.array([x_cor, y_cor, 100]), np.array([0, 0, 0]))
 
     print("Base:", actuator_lengths)
     actuator_lengths = actuator_lengths - servo_length

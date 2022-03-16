@@ -57,6 +57,7 @@ def get_converted(lines, shift_amts):
 def main():
     root = tk.Tk()
     root.withdraw()
+    root.wm_attributes("-topmost", 1)
 
     filename = filedialog.askopenfilename()
     with open(filename) as f:
