@@ -184,7 +184,7 @@ int main()
     }
 
     std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-    cout << "\n\nLowly moving down..." << endl;
+    cout << "\n\nSlowly moving down..." << endl;
     send_move_message( s, dest, min_slow );
   }
   else if( result == NFD_CANCEL )
