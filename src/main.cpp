@@ -13,30 +13,16 @@
 #pragma comment( lib, "ws2_32.lib" )
 using namespace std;
 
-// 400,000 = 170mm
-// 0       = 3.5mm
-// const int POS_MIN   = 0;
-// const int POS_MAX   = 170;
-// const int SCALE_MIN = 0;
-// const int SCALE_MAX = 400000;
-
-// const double GEAR                = 2.0;
-// const double MAX_ACCESS_DISTANCE = 200.0;
-// const double LEAD_DISTANCE       = 2.5;
-// const int    ONE_TURN_PULSE      = 1000;
-
 const double GEAR           = 1 / 1.5;
 const double MAX_DIST       = 200.0;
 const double LEAD_DISTANCE  = 5;
 const int    ONE_TURN_PULSE = 20000;
-
 
 int jog_pulse( double Gear, double AccessDistance, double LeadDistance, int OneTurnPulse )
 {
   AccessDistance = clamp( AccessDistance, 0.0, MAX_DIST );
   return static_cast<int>( Gear * AccessDistance * OneTurnPulse / LeadDistance );
 }
-
 
 vector<vector<string>> read_csv( const string & filename )
 {
@@ -155,89 +141,59 @@ int main()
   char broadcast = 1;
   setsockopt( s, SOL_SOCKET, SO_BROADCAST, &broadcast, sizeof( broadcast ) );
 
-  char * max = create_message( 1, 10, MAX_DIST, MAX_DIST, MAX_DIST, MAX_DIST, MAX_DIST, MAX_DIST );
-  char * mid =
-      create_message( 1, 10, MAX_DIST / 2, MAX_DIST / 2, MAX_DIST / 2, MAX_DIST / 2, MAX_DIST / 2, MAX_DIST / 2 );
-  char * min      = create_message( 1, 10, 0, 0, 0, 0, 0, 0 );
   char * min_slow = create_message( 1, 2000, 0, 0, 0, 0, 0, 0 );
 
-  bool run_custom = true;
 
-  if( run_custom )
+  nfdchar_t * outPath = nullptr;
+  nfdresult_t result  = NFD_OpenDialog( nullptr, nullptr, &outPath );
+
+  if( result == NFD_OKAY )
   {
-    char * rest  = create_message( 1, 1000, 105, 105, 105, 105, 105, 105 );
-    char * x_pos = create_message( 1, 1000, 104, 104, 89, 128, 128, 89 );
-    char * x_neg = create_message( 1, 1000, 110, 110, 125, 85, 85, 125 );
-    char * y_pos = create_message( 1, 1000, 84, 129, 121, 98, 116, 93 );
-    char * y_neg = create_message( 1, 1000, 129, 84, 93, 116, 98, 121 );
+    vector<pair<char *, int>> messages;
+    string                    filename = outPath;
+    vector<vector<string>>    csv_data = read_csv( filename );
 
-    char * x_cust = create_message( 1, 1000, 90, 102, 87, 118, 122, 80 );
+    for( int i = 1; i < csv_data.size(); i++ )
+    {
+      int    line    = stoi( csv_data[i][0] );
+      int    time    = stoi( csv_data[i][1] );
+      int    x       = stoi( csv_data[i][2] );
+      int    y       = stoi( csv_data[i][3] );
+      int    z       = stoi( csv_data[i][4] );
+      int    u       = stoi( csv_data[i][5] );
+      int    v       = stoi( csv_data[i][6] );
+      int    w       = stoi( csv_data[i][7] );
+      char * message = create_message( line, time, x, y, z, u, v, w );
+      messages.emplace_back( message, time );
+      cout << "Line: " << line << " Time: " << time << " X: " << x << " Y: " << y << " Z: " << z << " U: " << u
+           << " V: " << v << " W: " << w << endl;
+    }
 
-    send_move_message( s, dest, rest );
+    cout << "\n\nSending messages..." << endl;
+
+    if( !messages.empty() )
+    {
+      send_move_message( s, dest, messages[0].first );
+      std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+    }
+
+    for( auto & [message, time] : messages )
+    {
+      send_move_message( s, dest, message );
+      std::this_thread::sleep_for( std::chrono::milliseconds( time ) );
+    }
+
     std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-    send_move_message( s, dest, x_pos );
-    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-    send_move_message( s, dest, x_neg );
-    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-    send_move_message( s, dest, y_pos );
-    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-    send_move_message( s, dest, y_neg );
-    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+    cout << "\n\nLowly moving down..." << endl;
     send_move_message( s, dest, min_slow );
+  }
+  else if( result == NFD_CANCEL )
+  {
+    cout << "User pressed cancel." << std::endl;
   }
   else
   {
-    nfdchar_t * outPath = nullptr;
-    nfdresult_t result  = NFD_OpenDialog( nullptr, nullptr, &outPath );
-
-    if( result == NFD_OKAY )
-    {
-      vector<pair<char *, int>> messages;
-      string                    filename = outPath;
-      vector<vector<string>>    csv_data = read_csv( filename );
-
-      for( int i = 1; i < csv_data.size(); i++ )
-      {
-        int    line    = stoi( csv_data[i][0] );
-        int    time    = stoi( csv_data[i][1] );
-        int    x       = stoi( csv_data[i][2] );
-        int    y       = stoi( csv_data[i][3] );
-        int    z       = stoi( csv_data[i][4] );
-        int    u       = stoi( csv_data[i][5] );
-        int    v       = stoi( csv_data[i][6] );
-        int    w       = stoi( csv_data[i][7] );
-        char * message = create_message( line, time, x, y, z, u, v, w );
-        messages.emplace_back( message, time );
-        cout << "Line: " << line << " Time: " << time << " X: " << x << " Y: " << y << " Z: " << z << " U: " << u
-             << " V: " << v << " W: " << w << endl;
-      }
-
-      cout << "\n\nSending messages..." << endl;
-
-      if( !messages.empty() )
-      {
-        send_move_message( s, dest, messages[0].first );
-        std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-      }
-
-      for( auto & [message, time] : messages )
-      {
-        send_move_message( s, dest, message );
-        std::this_thread::sleep_for( std::chrono::milliseconds( time ) );
-      }
-
-      std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
-      cout << "\n\nLowly moving down..." << endl;
-      send_move_message( s, dest, min_slow );
-    }
-    else if( result == NFD_CANCEL )
-    {
-      cout << "User pressed cancel." << std::endl;
-    }
-    else
-    {
-      std::cout << "Error: " << NFD_GetError() << std::endl;
-    }
+    std::cout << "Error: " << NFD_GetError() << std::endl;
   }
 
   closesocket( s );
