@@ -17,26 +17,16 @@ def main():
             Angle  = 13 degrees - 0.2268 rad
     """
 
-    # Base Angle 0.1267
-    # Base Radius 474.659
-
-    # Platform Angle 0.2182
-    # Platform Radius 230.955
-
-    # platform_height = 570
-    # servo_length = 650
-    # platform = Stewart_Platform(507, 264, platform_height, 0.1226, 0.2268)
-
     platform_height = 570
     servo_length = 650
-    platform = Stewart_Platform(474.659, 230.955, platform_height, 0.1267, 0.2182)
+    platform = Stewart_Platform(507, 264, platform_height, 0.1226, 0.2268)
 
     # Initialize Plots
     fig, ax = plt.subplots()
 
     x = 50
     y = 0
-    angle = radians(45)
+    angle = radians(60)
     x_cor = x * cos(angle) + y * sin(angle)
     y_cor = -x * sin(angle) + y * cos(angle)
 
