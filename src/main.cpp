@@ -153,6 +153,15 @@ int main()
     string                    filename = outPath;
     vector<vector<string>>    csv_data = read_csv( filename );
 
+    if( csv_data.size() <= 1 ) cout << "\n\nNo Movement Data found. EXITING" << endl;
+
+    cout << "\n\nCreating messages..." << endl;
+
+
+    char * first_message = create_message( stoi( csv_data[1][0] ), 2000, stoi( csv_data[1][2] ), stoi( csv_data[1][3] ),
+                                           stoi( csv_data[1][4] ), stoi( csv_data[1][5] ), stoi( csv_data[1][6] ),
+                                           stoi( csv_data[1][7] ) );
+
     for( int i = 1; i < csv_data.size(); i++ )
     {
       int    line    = stoi( csv_data[i][0] );
@@ -173,8 +182,8 @@ int main()
 
     if( !messages.empty() )
     {
-      send_move_message( s, dest, messages[0].first );
-      std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+      send_move_message( s, dest, first_message );
+      std::this_thread::sleep_for( std::chrono::milliseconds( 2000 ) );
     }
 
     for( auto & [message, time] : messages )
