@@ -1,14 +1,11 @@
 #include <WinSock2.h>
-#include <Windows.h>
 #include <Ws2tcpip.h>
 #include <algorithm>
-#include <chrono>
 #include <fstream>
 #include <iostream>
 #include <nfd.h>
 #include <sstream>
 #include <string>
-#include <thread>
 #include <vector>
 
 #pragma comment( lib, "ws2_32.lib" )
