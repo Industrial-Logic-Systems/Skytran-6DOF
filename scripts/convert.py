@@ -8,10 +8,14 @@ from numpy import cos
 from numpy import sin
 from stewart_controller import Stewart_Platform
 
-min = 0
-max = 200
-platform_height = 570
-servo_length = 650
+min = 0  # Minimum allowed length for actuators
+max = 200  # Maximum allowed length for actuators
+platform_height = 570  # Initial Heigh of the platform
+servo_length = 650  # Length of the actuators in their base position
+XY_rotate_amount = 60  # Amount to rotate XY-axis so that it matches the chair
+PR_rotate_amount = -30  # Amount to rotate Pitch and Roll so that it matches the chair
+
+# Values for the Stewart Platform are defined in stewart_controller.py
 platform = Stewart_Platform(507, 264, platform_height, 0.1226, 0.2268)
 
 
@@ -33,14 +37,22 @@ def get_converted(lines, shift_amts):
         prev_time = cur_time
         x_og = line[1] * 1000 + shift_amts[0]
         y_og = line[2] * 1000 + shift_amts[1]
-        angle = radians(45)
+        pitch_og = line[4]
+        roll_og = line[5]
+        z = line[3] * 1000 + shift_amts[2]
+        yaw = line[6]
+
+        # Rotate XY to match actual chair
+        angle = radians(XY_rotate_amount)
         x = x_og * cos(angle) + y_og * sin(angle)
         y = -x_og * sin(angle) + y_og * cos(angle)
-        z = line[3] * 1000 + shift_amts[2]
-        u = line[4]
-        v = line[5]
-        w = line[6]
-        actuator_lengths = platform.calculate(np.array([x, y, z]), np.array([u, v, w]))
+
+        # Rotate Pitch and Roll to match actual chair
+        angle = radians(PR_rotate_amount)
+        pitch = pitch_og * cos(angle) + roll_og * sin(angle)
+        roll = -pitch_og * sin(angle) + roll_og * cos(angle)
+
+        actuator_lengths = platform.calculate(np.array([x, y, z]), np.array([pitch, roll, yaw]))
         actuator_lengths = actuator_lengths - servo_length
         result = verify_lengths(actuator_lengths, min, max)
         if not result:

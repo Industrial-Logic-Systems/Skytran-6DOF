@@ -1,4 +1,5 @@
 #include <WinSock2.h>
+#include <Windows.h>
 #include <Ws2tcpip.h>
 #include <algorithm>
 #include <chrono>
@@ -17,6 +18,28 @@ const double GEAR           = 1 / 1.5;
 const double MAX_DIST       = 200.0;
 const double LEAD_DISTANCE  = 5;
 const int    ONE_TURN_PULSE = 20000;
+
+static NTSTATUS( __stdcall * NtDelayExecution )( BOOL Alertable, PLARGE_INTEGER DelayInterval ) = (NTSTATUS(
+    __stdcall * )( BOOL, PLARGE_INTEGER )) GetProcAddress( GetModuleHandle( "ntdll.dll" ), "NtDelayExecution" );
+static NTSTATUS( __stdcall * ZwSetTimerResolution )( IN ULONG RequestedResolution, IN BOOLEAN Set,
+                                                     OUT PULONG ActualResolution ) =
+    (NTSTATUS( __stdcall * )( ULONG, BOOLEAN, PULONG )) GetProcAddress( GetModuleHandle( "ntdll.dll" ),
+                                                                        "ZwSetTimerResolution" );
+
+static void SleepShort( float milliseconds )
+{
+  static bool once = true;
+  if( once )
+  {
+    ULONG actualResolution;
+    ZwSetTimerResolution( 1, true, &actualResolution );
+    once = false;
+  }
+
+  LARGE_INTEGER interval;
+  interval.QuadPart = -1 * (int) ( milliseconds * 10000.0f );
+  NtDelayExecution( false, &interval );
+}
 
 int jog_pulse( double Gear, double AccessDistance, double LeadDistance, int OneTurnPulse )
 {
@@ -183,16 +206,16 @@ int main()
     if( !messages.empty() )
     {
       send_move_message( s, dest, first_message );
-      std::this_thread::sleep_for( std::chrono::milliseconds( 2000 ) );
+      SleepShort( 2000 );
     }
 
     for( auto & [message, time] : messages )
     {
       send_move_message( s, dest, message );
-      std::this_thread::sleep_for( std::chrono::milliseconds( time ) );
+      SleepShort( time );
     }
 
-    std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+    SleepShort( 1000 );
     cout << "\n\nSlowly moving down..." << endl;
     send_move_message( s, dest, min_slow );
   }

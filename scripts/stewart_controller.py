@@ -1,7 +1,4 @@
-import matplotlib.pyplot as plt
 import numpy as np
-from mpl_toolkits.mplot3d import axes3d
-from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 
 class Stewart_Platform:
@@ -13,25 +10,16 @@ class Stewart_Platform:
     To initialize, pass 6 parameters
     r_B = Radius for circumscribed circle where all the anchor points for servo shaft lie on
     r_P = Radius for circumscribed circle where all anchor points for platform lie on
-    ldl = |d| = length of actuators
+    ldl = |d| = Intiall height of platform
     gamma_B = Half of angle between two anchors on the base
     gamma_P = Half of angle between two anchors on the platform
+    Code is modified from this repo - https://github.com/Yeok-c/Stewart_Py
     """
 
     def __init__(s, r_B, r_P, ldl, gamma_B, gamma_P):
         pi = np.pi
 
         # Psi_B (Polar coordinates)
-        # psi_B = np.array(
-        #    [
-        #        -gamma_B,
-        #        gamma_B,
-        #        2 * pi / 3 - gamma_B,
-        #        2 * pi / 3 + gamma_B,
-        #        2 * pi / 3 + 2 * pi / 3 - gamma_B,
-        #        2 * pi / 3 + 2 * pi / 3 + gamma_B,
-        #    ]
-        # )
         psi_B = np.array(
             [
                 -gamma_B,
@@ -45,16 +33,6 @@ class Stewart_Platform:
 
         # psi_P (Polar coordinates)
         # Direction of the points where the rod is attached to the platform.
-        # psi_P = np.array(
-        #     [
-        #         pi / 3 + 2 * pi / 3 + 2 * pi / 3 + gamma_P,
-        #         pi / 3 + -gamma_P,
-        #         pi / 3 + gamma_P,
-        #         pi / 3 + 2 * pi / 3 - gamma_P,
-        #         pi / 3 + 2 * pi / 3 + gamma_P,
-        #         pi / 3 + 2 * pi / 3 + 2 * pi / 3 - gamma_P,
-        #     ]
-        # )
         psi_P = np.array(
             [
                 pi / 3 + 2 * pi / 3 + 2 * pi / 3 + gamma_P,
@@ -109,13 +87,10 @@ class Stewart_Platform:
 
         # Definition of the platform home position.
         s.home_pos = np.array([0, 0, s.ldl])
-        # s.home_pos = np.transpose(home_pos)
 
         # Allocate for variables
         s.l = np.zeros((3, 6))
         s.lll = np.zeros(6)
-        # s.angles = np.zeros((6))
-        # s.H = np.zeros((3, 6))
 
     def calculate(s, trans, rotation):
         trans = np.transpose(trans)
@@ -123,9 +98,6 @@ class Stewart_Platform:
 
         # Get rotation matrix of platform. RotZ* RotY * RotX -> matmul
         R = np.matmul(np.matmul(s.rotZ(rotation[2]), s.rotY(rotation[1])), s.rotX(rotation[0]))
-
-        # Get leg length for each leg
-        # leg = np.repeat(trans[:, np.newaxis], 6, axis=1) + np.repeat(home_pos[:, np.newaxis], 6, axis=1) + np.matmul(np.transpose(R), P) - B
 
         # Get leg length for each leg
         s.l = (
@@ -140,34 +112,6 @@ class Stewart_Platform:
         s.L = s.l + s.B
 
         return s.lll
-
-    def plot3D_line(s, ax, vec_arr_origin, vec_arr_dest, color_):
-        colors = ["orange", "red", "green", "blue", "yellow", "black"]
-        for i in range(6):
-            ax.plot(
-                [vec_arr_origin[0, i], vec_arr_dest[0, i]],
-                [vec_arr_origin[1, i], vec_arr_dest[1, i]],
-                [vec_arr_origin[2, i], vec_arr_dest[2, i]],
-                color=colors[i],
-            )
-
-    def plot_platform(s):
-        ax = plt.axes(projection="3d")  # Data for a three-dimensional line
-        ax.set_xlim3d(-600, 600)
-        ax.set_ylim3d(-600, 600)
-        ax.set_zlim3d(0, 600)
-        ax.set_xlabel("x-axis")
-        ax.set_ylabel("y-axis")
-        ax.set_zlabel("z-axis")
-
-        # ax.add_collection3d(Poly3DCollection([list(np.transpose(s.B))]), zs='z')
-        ax.add_collection3d(Poly3DCollection([list(np.transpose(s.B))], facecolors="green", alpha=0.25))
-
-        # ax.add_collection3d(base_plot, zs='z')
-        ax.add_collection3d(Poly3DCollection([list(np.transpose(s.L))], facecolors="blue", alpha=0.25))
-
-        s.plot3D_line(ax, s.B, s.L, "orange")
-        return ax
 
     def rotX(s, theta):
         rotx = np.array([[1, 0, 0], [0, np.cos(theta), -np.sin(theta)], [0, np.sin(theta), np.cos(theta)]])
