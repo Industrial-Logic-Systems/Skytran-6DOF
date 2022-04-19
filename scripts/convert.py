@@ -113,7 +113,8 @@ def main():
                     print("Invalid axis")
             else:
                 return
-            print(f"Shifting X-axis by {shift_amts[0]}, Y-axis by {shift_amts[1]}, Z-axis by {shift_amts[2]}")
+            print(f"\nShifting X-axis by {shift_amts[0]}, Y-axis by {shift_amts[1]}, Z-axis by {shift_amts[2]}\n")
+            print("\n" * 3)
 
     print("Conversion finished...")
 
