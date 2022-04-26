@@ -1,5 +1,7 @@
 import csv
 import tkinter as tk
+from enum import auto
+from enum import Enum
 from math import radians
 from tkinter import filedialog
 
@@ -19,11 +21,27 @@ PR_rotate_amount = -30  # Amount to rotate Pitch and Roll so that it matches the
 platform = Stewart_Platform(507, 264, platform_height, 0.1226, 0.2268)
 
 
+class verify_values(Enum):
+    valid = auto()
+    low = auto()
+    hi = auto()
+    hi_low = auto()
+
+
 def verify_lengths(lengths, min, max):
+    below_min = above_max = False
     for length in lengths:
-        if length < min or length > max:
-            return False
-    return True
+        if length < min:
+            below_min = True
+        if length > max:
+            above_max = True
+    if below_min and above_max:
+        return verify_values.hi_low
+    if below_min:
+        return verify_values.low
+    if above_max:
+        return verify_values.hi
+    return verify_values.valid
 
 
 def get_converted(lines, shift_amts):
@@ -54,13 +72,21 @@ def get_converted(lines, shift_amts):
 
         actuator_lengths = platform.calculate(np.array([x, y, z]), np.array([pitch, roll, yaw]))
         actuator_lengths = actuator_lengths - servo_length
-        result = verify_lengths(actuator_lengths, min, max)
-        if not result:
-            print("Invalid lengths: ", actuator_lengths)
-            print("If values are less than {min} try moving the whole motion profile up by adding to the Z axis")
-            print(f"If values are greater than {max} it likely means your moving out of range of the platform")
-            return None
         actuator_lengths = [round(x) for x in actuator_lengths]
+        result = verify_lengths(actuator_lengths, min, max)
+
+        if result is not verify_values.valid:
+            print("Invalid lengths: ", actuator_lengths)
+            if result is verify_values.hi_low:
+                print(
+                    f"There is an actuator length greater than {max} and less than {min}. This likely means that your profile wont work on this platform"
+                )
+            if result is verify_values.low:
+                print(f"There is an actuator length lower than {min}. Try shifting up on the Z-axis")
+            if result is verify_values.hi:
+                print(f"There is an actuator length greater than {max}. Try shifting down on the Z-axis")
+            return None
+
         convert.extend(actuator_lengths)
         converted.append(convert)
     return converted
@@ -90,7 +116,6 @@ def main():
         ]
         for line in lines
     ]
-    # print(lines)
 
     print("Starting conversion...")
 
