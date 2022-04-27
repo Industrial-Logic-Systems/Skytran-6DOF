@@ -25,9 +25,10 @@ For ninja build you will need to but it in a folder alreay in the System Path Va
 Once you have those installed you can now build the software
 
 ### Commands to build
-`mkdir build` <br>
-`cd build` <br>
-`cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_BUILD_TYPE=Release .. -G Ninja` <br>
-`cmake --build .` <br>
-
+``` bash
+mkdir build
+cd build
+cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_BUILD_TYPE=Release .. -G Ninja
+cmake --build .
+```
 If done properly then the build directory will contain `Skytran_6DOF.exe` which is the compiled code.
